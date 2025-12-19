@@ -722,10 +722,20 @@
   margin:0;
   font-size:16px;
   color:rgba(255,255,255,.92);
-  font-weight:500;            /* ✅ quote NOT bold */
+  font-weight:400 !important;     /* ✅ not bold */
+  font-style:italic;              /* ✅ italics */
   max-width:90ch;
 }
 
+/* space between quote and name block */
+.testimonial .who{
+  margin-top:18px;                /* ✅ more breathing room */
+}
+
+/* keep only the name/designation bold, not the quote */
+.testimonial .who b{
+  font-weight:900;
+}
 .videoThumb{
   position:relative;
   display:block;
@@ -1498,6 +1508,7 @@
   </script>
 </body>
 </html>
+
 
 
 
