@@ -1513,118 +1513,6 @@
       })
     }, {threshold: 0.35});
     if(impactSection) impactIO.observe(impactSection);
-
-    // ===== Password-only edit feature =====
-    const unlockBtn = document.getElementById('unlockBtn');
-    const adminBar = document.getElementById('adminBar');
-    const editPill = document.getElementById('editPill');
-    const editSwitch = document.getElementById('editSwitch');
-    const saveBtn = document.getElementById('saveBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const lockBtn = document.getElementById('lockBtn');
-    const editables = [...document.querySelectorAll('.editable')];
-
-    // Password: SHA-256("MSL Pune@2025")
-    const PASS_HASH_HEX = "c020253e6eb93942ba97f3a1939a96834213141b0f6779067cc68bd218248ab5";
-    const STORAGE_KEY = "scania_microsite_edits_v1";
-
-    function hex(buffer){
-      const bytes = new Uint8Array(buffer);
-      return Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
-    }
-    async function sha256(str){
-      const enc = new TextEncoder().encode(str);
-      const dig = await crypto.subtle.digest('SHA-256', enc);
-      return hex(dig);
-    }
-
-    function setEditMode(on){
-      document.body.classList.toggle('editing', on);
-      editSwitch.classList.toggle('on', on);
-      editables.forEach(el => el.setAttribute('contenteditable', on ? 'true' : 'false'));
-    }
-    setEditMode(false);
-
-    function getEditsFromDOM(){
-      const payload = {};
-      editables.forEach(el => {
-        const key = el.getAttribute('data-edit');
-        if(!key) return;
-        payload[key] = el.innerHTML;
-      });
-      return payload;
-    }
-    function applyEditsToDOM(payload){
-      if(!payload) return;
-      editables.forEach(el => {
-        const key = el.getAttribute('data-edit');
-        if(!key) return;
-        if(payload[key] != null){
-          el.innerHTML = payload[key];
-        }
-      });
-    }
-    function saveEdits(){
-      const payload = getEditsFromDOM();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-      unlockBtn.textContent = "Saved";
-      setTimeout(()=>{ unlockBtn.textContent = "Edit"; }, 700);
-    }
-    function resetEdits(){
-      localStorage.removeItem(STORAGE_KEY);
-      location.reload();
-    }
-
-    editables.forEach(el => {
-      el.addEventListener('blur', () => {
-        if(!document.body.classList.contains('editing')) return;
-        if(!el.getAttribute('data-edit')) return;
-        saveEdits();
-      });
-    });
-
-    try{
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if(saved) applyEditsToDOM(JSON.parse(saved));
-    }catch(e){}
-
-    function lock(){
-      adminBar.style.display = 'none';
-      setEditMode(false);
-      sessionStorage.removeItem('scania_admin_unlocked');
-    }
-
-    async function unlockFlow(){
-      const input = prompt("Password required to edit:");
-      if(!input) return;
-      const h = await sha256(input);
-      if(h === PASS_HASH_HEX){
-        sessionStorage.setItem('scania_admin_unlocked','1');
-        adminBar.style.display = 'flex';
-      }else{
-        alert("Incorrect password.");
-      }
-    }
-
-    if(sessionStorage.getItem('scania_admin_unlocked') === '1'){
-      adminBar.style.display = 'flex';
-    }
-
-    unlockBtn.addEventListener('click', unlockFlow);
-
-    function toggleEdit(){
-      if(adminBar.style.display !== 'flex') return;
-      setEditMode(!document.body.classList.contains('editing'));
-    }
-    editPill.addEventListener('click', toggleEdit);
-    editPill.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleEdit(); } });
-
-    saveBtn.addEventListener('click', saveEdits);
-    resetBtn.addEventListener('click', ()=>{
-      if(confirm("Reset all saved edits and reload?")) resetEdits();
-    });
-    lockBtn.addEventListener('click', lock);
-
     // ===== Truck cursor =====
     const cursor = document.getElementById('truckCursor');
     let mx = 0, my = 0;
@@ -1658,6 +1546,7 @@
   </script>
 </body>
 </html>
+
 
 
 
